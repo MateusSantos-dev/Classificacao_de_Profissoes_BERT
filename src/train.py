@@ -6,6 +6,7 @@ from transformers import (
 )
 from datasets import DatasetDict
 from src.eval import compute_metrics
+from src.callbacks import EarlyStoppingCallback
 
 
 def train_model(
@@ -14,7 +15,11 @@ def train_model(
         tokenizer: PreTrainedTokenizerBase,
         output_dir: str = "./results/models",
         num_train_epochs: int = 3,
-        learning_rate: float = 1.5e-5
+        learning_rate: float = 1.5e-5,
+        use_early_stopping: bool = False,
+        patience_steps: int = 300,
+        min_steps: int = 500,
+        improvement_treshold: float = 0
 ) -> Trainer:
 
     training_args = TrainingArguments(
@@ -53,6 +58,13 @@ def train_model(
         tokenizer=tokenizer,
         compute_metrics=compute_metrics
     )
+    if use_early_stopping:
+        early_stopping = EarlyStoppingCallback(
+            patience_steps=patience_steps,
+            min_steps=min_steps,
+            improvement_threshold=improvement_treshold
+        )
+        trainer.add_callback(early_stopping)
 
     trainer.train()
     return trainer
