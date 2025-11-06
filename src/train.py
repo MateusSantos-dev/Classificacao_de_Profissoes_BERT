@@ -13,18 +13,16 @@ def train_model(
         model: PreTrainedModel,
         dataset: DatasetDict,
         tokenizer: PreTrainedTokenizerBase,
-        output_dir: str = "./results/models",
-        num_train_epochs: int = 3,
-        learning_rate: float = 1.5e-5,
+        output_dir: str = "./results/models/bert/freeze_8",
+        num_train_epochs: int = 10,
+        learning_rate: float = 2e-5,
         use_early_stopping: bool = False,
         patience_steps: int = 300,
         min_steps: int = 500,
-        improvement_treshold: float = 0
+        improvement_threshold: float = 0
 ) -> Trainer:
 
     training_args = TrainingArguments(
-        warmup_ratio=0.1,
-        weight_decay=0.03,
         learning_rate=learning_rate,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=32,
@@ -32,13 +30,13 @@ def train_model(
 
         num_train_epochs=num_train_epochs,
         load_best_model_at_end=True,
-        metric_for_best_model="eval_loss",
+        metric_for_best_model="eval_accuracy",
         save_total_limit=2,
         report_to="none",
         fp16=True,
 
         logging_dir="./results/logs",
-        logging_steps=50,
+        logging_steps=10,
         log_level="info",
         log_level_replica="warning",
         log_on_each_node=True,
@@ -62,7 +60,7 @@ def train_model(
         early_stopping = EarlyStoppingCallback(
             patience_steps=patience_steps,
             min_steps=min_steps,
-            improvement_threshold=improvement_treshold
+            improvement_threshold=improvement_threshold
         )
         trainer.add_callback(early_stopping)
 
