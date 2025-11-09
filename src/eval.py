@@ -23,8 +23,10 @@ def compute_metrics(eval_pred: tuple[np.ndarray, np.ndarray]) -> dict[str, float
 def detailed_report(y_true: list[int], y_pred: list[int], label_names: list[str]) -> dict:
     report = classification_report(y_true, y_pred, target_names=label_names, output_dict=True)
     matrix = confusion_matrix(y_true, y_pred).tolist()  # formato serializável
+    accuracy = accuracy_score(y_true, y_pred)
 
     return {
         "report": report,
-        "confusion_matrix": matrix
+        "confusion_matrix": matrix,
+        "accuracy": accuracy
     }

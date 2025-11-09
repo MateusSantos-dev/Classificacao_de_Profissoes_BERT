@@ -4,4 +4,4 @@ scikit-learn~=1.7.2
 numpy~=1.26.1
 transformers~=4.57.1
 torch~=2.6.0
-lime~=0.2.0.1
+eli5~=0.16.0

@@ -10,10 +10,10 @@ df = load_dataset("dataset/ep2-train.csv")
 dataset = make_splits(df, test_size=0.15, val_size=0.15)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(device)
+print("usando gpu" if device == "cuda" else "usando cpu")
 
-model_type = "bert"  # bert deberta
-model_name = "neuralmind/bert-large-portuguese-cased"  # "neuralmind/bert-large-portuguese-cased" tgsc/debertina-large
+model_type = "bert"  # "bert" "deberta"
+model_name = "neuralmind/bert-large-portuguese-cased"  # "neuralmind/bert-large-portuguese-cased" "tgsc/debertina-large"
 tokenizer = prepare_tokenizer(model_name=model_name)
 tokenized_datasets = dataset.map(lambda x: tokenize_function(x, tokenizer, max_length=512), batched=True)
 tokenized_datasets, label2id, id2label = encode_labels(tokenized_datasets)
@@ -39,7 +39,7 @@ trainer = train_model(
     improvement_threshold=0.001,
 )
 
-print("📊 Avaliando modelo no conjunto de teste...\n")
+print("Avaliando modelo no conjunto de teste...\n")
 predictions = trainer.predict(tokenized_datasets["test"])
 preds = predictions.predictions.argmax(axis=-1)
 y_true = predictions.label_ids.tolist()
@@ -48,6 +48,7 @@ y_pred = preds.tolist()
 report = detailed_report(y_true, y_pred, list(label2id.keys()))
 
 print("\n--- MÉTRICAS GERAIS ---")
+print(f"accuracy score={report['accuracy']:.3f}")
 for cls, metrics in report["report"].items():
     if isinstance(metrics, dict):
         print(f"{cls}: acc={metrics['precision']:.3f}, rec={metrics['recall']:.3f}, f1={metrics['f1-score']:.3f}")
